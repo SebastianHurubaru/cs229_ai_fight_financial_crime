@@ -63,8 +63,17 @@ class RESTClient:
             self.doTimeout()
             response = self.session.get(url, params=params, timeout=self.req_timeout)
 
-        responseJson = response.json()
+        try:
+            responseJson = response.json()
+
+        except Exception as e:
+            log.error('Parsing the following response to Json failed: {}'.format(response))
+            log.error('Exception occurred: {}'.format(e))
 
         log.debug(responseJson)
+
+        # record could not be found/does not exist
+        if response.status_code == 404:
+            responseJson = None
 
         return responseJson
