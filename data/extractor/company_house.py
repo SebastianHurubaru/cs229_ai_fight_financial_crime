@@ -39,7 +39,7 @@ def searchCompanies(search_string):
 
     for page_index in range(int(max_records/page_size)):
 
-        params = {'q': search_string, 'items_per_page': page_size, 'start_index': page_index}
+        params = {'q': search_string, 'items_per_page': page_size, 'start_index': page_index*page_size}
 
         response = restClient.doRequest('/search/companies', params)
 
