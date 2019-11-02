@@ -66,8 +66,8 @@ def getCompanyHouseData():
             insertCompany(company_profile)
 
             # process company's officers
-            company_officers = getCompanyOfficers(company_profile, company_number)
-            insertCompanyOfficers(company_officers.get("items", []))
+            company_officers = getCompanyOfficers(company_number)
+            insertCompanyOfficers(company_profile, company_officers.get("items", []))
 
             # process officer appointments
             for officer in company_officers.get("items", []):
