@@ -28,6 +28,26 @@ def findCompany(company_number):
 
     return found
 
+
+def companyDoesNotExist(company_number):
+
+    found = False
+
+    try:
+
+        if db.company_not_existing.find_one({'company_number': company_number}) != None:
+            found = True
+
+    except Exception as e:
+
+        log.error('Looking for company {} has failed. Please check the reason below!'.format(company_number))
+        log.error('Exception occurred: {}'.format(e))
+
+
+    return found
+
+
+
 def insertCompany(company):
 
     try:
@@ -40,6 +60,18 @@ def insertCompany(company):
         log.error('Insert of company {} has failed! Please check the reason below!'.format(company["company_number"]))
         log.error('Exception occurred: {}'.format(e))
 
+
+def insertNotExistingCompany(company_number):
+
+    try:
+
+        company_id = db.company_not_existing.insert_one({"company_number": company_number}).inserted_id
+        return company_id
+
+    except Exception as e:
+
+        log.error('Insert of company {} has failed! Please check the reason below!'.format(company_number))
+        log.error('Exception occurred: {}'.format(e))
 
 def insertCompanyOfficers(company, officers):
 
