@@ -1,11 +1,15 @@
-import pandas as pd
 import numpy as np
 from util.mongodb import *
 from util.config import *
+import argparse
 
 if __name__ == "__main__":
 
     log = logging.getLogger('country_collection')
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--file", help="csv file to save the inputs", type=str, default='/mnt/data/pycharm-projects/cs229/data/input/features_all.csv')
+    args = parser.parse_args()
 
     mongodb_connection = MongoDBWrapper('cs229')
 
@@ -30,7 +34,7 @@ if __name__ == "__main__":
 
         company_input = np.zeros(np.shape(countries))
 
-        company_officer_appointments = mongodb_connection.db.officer_appointments.find({'appointed_to.company_number': company_number})
+        company_officer_appointments = mongodb_connection.db.officer_appointments.find({'appointed_to.company_number': company_number}, {'country_of_residence': 1, 'address.country': 1, '_id': 0})
         if company_officer_appointments is not None:
             for officer in company_officer_appointments:
 
@@ -52,12 +56,12 @@ if __name__ == "__main__":
 
         inputs.append([company_number] + list(company_input))
 
-        if index % 50 == 0:
+        if index % 1000 == 0:
             log.info('Processed {} companies'.format(index))
 
     log.info('Finished processing {} total of companies'.format(index))
 
     input_df = pd.DataFrame(inputs, columns=['company_number'] + countries).set_index('company_number', drop=True)
-    input_df.to_csv('../input/features_all.csv', index=True, header=True)
+    input_df.to_csv(args.file, index=True, header=True)
 
     log.info("Finished extracting features out of the database")
