@@ -46,6 +46,39 @@ class UKCompanyHouse:
         return response
 
 
+    def processCompany(self, company_number):
+
+        # process company profile
+        company_profile = self.getCompanyProfile(company_number)
+        if company_profile is None:
+            self.mongodb_connection.insertNotExistingCompany(company_number)
+            return False
+
+        log.info("Processing company {}".format(company_number))
+
+        # process company's officers
+        company_officers = self.getCompanyOfficers(company_number)
+        if company_officers is not None:
+            self.mongodb_connection.insertCompanyOfficers(company_profile, company_officers.get("items", []))
+
+            # process officer appointments
+            for officer in company_officers.get("items", []):
+                officer_appointments = self.getOfficerAppointments(officer["links"]["officer"]["appointments"])
+                if officer_appointments is not None:
+                    self.mongodb_connection.insertOfficerAppointments(officer["links"]["officer"]["appointments"],
+                                                                      officer_appointments.get("items", []))
+
+        # process company's persons with significant control
+        company_pscs = self.getCompanyPersonsWithSignificantControl(company_number)
+        if company_pscs is not None:
+            self.mongodb_connection.insertCompanyPersonsWithSignificantControl(company_profile,
+                                                                               company_pscs.get("items", []))
+
+        # save company at the end
+        self.mongodb_connection.insertCompany(company_profile)
+
+        return True
+
     def getRandomCompanyHouseData(self):
 
         processedCompanyItems = 0
@@ -63,31 +96,9 @@ class UKCompanyHouse:
                 continue
 
             # process company profile
-            company_profile = self.getCompanyProfile(company_number)
-            if company_profile is None:
-                self.mongodb_connection.insertNotExistingCompany(company_number)
+            if self.processCompany(company_number) == False:
                 continue
 
-            log.info("Processing company {}".format(company_number))
-
-            # process company's officers
-            company_officers = self.getCompanyOfficers(company_number)
-            if company_officers is not None:
-                self.mongodb_connection.insertCompanyOfficers(company_profile, company_officers.get("items", []))
-
-                # process officer appointments
-                for officer in company_officers.get("items", []):
-                    officer_appointments = self.getOfficerAppointments(officer["links"]["officer"]["appointments"])
-                    if officer_appointments is not None:
-                        self.mongodb_connection.insertOfficerAppointments(officer["links"]["officer"]["appointments"], officer_appointments.get("items", []))
-
-            # process company's persons with significant control
-            company_pscs = self.getCompanyPersonsWithSignificantControl(company_number)
-            if company_pscs is not None:
-                self.mongodb_connection.insertCompanyPersonsWithSignificantControl(company_profile, company_pscs.get("items", []))
-
-            # save company at the end
-            self.mongodb_connection.insertCompany(company_profile)
             processedCompanyItems += 1
 
             log.debug('Processed so far {} companies!'.format(processedCompanyItems))
@@ -95,9 +106,35 @@ class UKCompanyHouse:
             if processedCompanyItems % 100 == 0:
                 log.info('Processed so far {} companies!'.format(processedCompanyItems))
 
-
         log.info('Finished processing {} companies!'.format(processedCompanyItems))
 
 
+    def getTroikaCompany(self, company_number, depth):
 
+        if depth is 0: return
+
+        # skip if company already processed
+        if self.mongodb_connection.findCompany(company_number) == True:
+            return
+
+        self.processCompany(company_number)
+
+        # process company's officers
+        company_officers = self.getCompanyOfficers(company_number)
+        if company_officers is not None:
+            for officer in company_officers.get("items", []):
+                self.getTroikaOfficers(officer, depth - 1)
+
+    def getTroikaOfficers(self, officer, depth):
+
+        if depth is 0: return
+
+        # get officer appointments
+        officer_appointments = self.getOfficerAppointments(officer["links"]["officer"]["appointments"])
+        for appointment in officer_appointments.get("items", []):
+            self.getTroikaCompany(appointment['appointed_to']['company_number'], depth)
+
+    def getTroikaCompanyHouseData(self, start_company_number, depth):
+
+        self.getTroikaCompany(start_company_number, depth)
 

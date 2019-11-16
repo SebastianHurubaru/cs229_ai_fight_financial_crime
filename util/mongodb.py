@@ -77,7 +77,25 @@ class MongoDBWrapper:
     
             log.error('Insert of company {} has failed! Please check the reason below!'.format(company_number))
             log.error('Exception occurred: {}'.format(e))
-    
+
+
+    def findOfficer(self, officer):
+
+        found = False
+
+        try:
+
+            if self.db.officer.find_one({'links.officer.appointments': officer['links']['officer']['appointments']}) != None:
+                found = True
+
+        except Exception as e:
+
+            log.error('Looking for officer {} has failed. Please check the reason below!'.format(officer['links']['officer']['appointments']))
+            log.error('Exception occurred: {}'.format(e))
+
+        return found
+
+
     def insertCompanyOfficers(self, company, officers):
     
         if len(officers) == 0:
