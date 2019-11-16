@@ -11,6 +11,8 @@ restClient = RESTClient(API_KEYS, TIMEOUT, BASE_URL)
 
 MAX_COMPANY_NUMBERS = 300000
 
+mongodb_connection = MongoDBWrapper('cs229_test')
+
 def generateCompanyNumbers():
 
     englandAndWales = [''.join(tuples) for tuples in list(permutations('0123456789', 8))]
@@ -55,13 +57,13 @@ def getCompanyHouseData():
             break;
 
         # skip if company already in our database
-        if companyDoesNotExist(company_number) == True or findCompany(company_number) == True:
+        if mongodb_connection.companyDoesNotExist(company_number) == True or mongodb_connection.findCompany(company_number) == True:
             continue
 
         # process company profile
         company_profile = getCompanyProfile(company_number)
         if company_profile is None:
-            insertNotExistingCompany(company_number)
+            mongodb_connection.insertNotExistingCompany(company_number)
             continue
 
         log.info("Processing company {}".format(company_number))
@@ -69,21 +71,21 @@ def getCompanyHouseData():
         # process company's officers
         company_officers = getCompanyOfficers(company_number)
         if company_officers is not None:
-            insertCompanyOfficers(company_profile, company_officers.get("items", []))
+            mongodb_connection.insertCompanyOfficers(company_profile, company_officers.get("items", []))
 
             # process officer appointments
             for officer in company_officers.get("items", []):
                 officer_appointments = getOfficerAppointments(officer["links"]["officer"]["appointments"])
                 if officer_appointments is not None:
-                    insertOfficerAppointments(officer["links"]["officer"]["appointments"], officer_appointments.get("items", []))
+                    mongodb_connection.insertOfficerAppointments(officer["links"]["officer"]["appointments"], officer_appointments.get("items", []))
 
         # process company's persons with significant control
         company_pscs = getCompanyPersonsWithSignificantControl(company_number)
         if company_pscs is not None:
-            insertCompanyPersonsWithSignificantControl(company_profile, company_pscs.get("items", []))
+            mongodb_connection.insertCompanyPersonsWithSignificantControl(company_profile, company_pscs.get("items", []))
 
         # save company at the end
-        insertCompany(company_profile)
+        mongodb_connection.insertCompany(company_profile)
         processedCompanyItems += 1
 
         log.debug('Processed so far {} companies!'.format(processedCompanyItems))
