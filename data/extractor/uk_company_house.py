@@ -113,11 +113,9 @@ class UKCompanyHouse:
 
         if depth is 0: return
 
-        # skip if company already processed
-        if self.mongodb_connection.findCompany(company_number) == True:
-            return
-
-        self.processCompany(company_number)
+        # save company data if not already processed
+        if self.mongodb_connection.findCompany(company_number) is False:
+            self.processCompany(company_number)
 
         # process company's officers
         company_officers = self.getCompanyOfficers(company_number)
@@ -131,8 +129,10 @@ class UKCompanyHouse:
 
         # get officer appointments
         officer_appointments = self.getOfficerAppointments(officer["links"]["officer"]["appointments"])
-        for appointment in officer_appointments.get("items", []):
-            self.getTroikaCompany(appointment['appointed_to']['company_number'], depth)
+
+        if officer_appointments is not None:
+            for appointment in officer_appointments.get("items", []):
+                self.getTroikaCompany(appointment['appointed_to']['company_number'], depth)
 
     def getTroikaCompanyHouseData(self, start_company_number, depth):
 
