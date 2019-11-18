@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.decomposition import PCA
+from sklearn import preprocessing
 from util.config import *
 import argparse
 import matplotlib.pyplot as plt
@@ -47,9 +48,12 @@ if __name__ == "__main__":
 
     y = np.reshape(y, (n_examples, ))
 
+    # Standardize the data to have a zero mean and a unit variance, as it is required by PCA
+    x_scaled = preprocessing.scale(x)
+
     # Do PCA decomposition in two components
     pca = PCA(n_components=2)
-    x_transformed = pca.fit_transform(x)
+    x_transformed = pca.fit_transform(x_scaled)
 
     log.info('Explained variance ratio: {}'.format(pca.explained_variance_ratio_))
 
