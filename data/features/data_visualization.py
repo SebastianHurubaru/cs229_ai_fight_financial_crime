@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.decomposition import PCA
+from sklearn import preprocessing
 from util.config import *
 import argparse
 import matplotlib.pyplot as plt
@@ -8,6 +9,7 @@ log = logging.getLogger('data_visualization')
 
 
 def plot_points(x, y):
+
     """Plot some points where x are the coordinates and y is the label"""
     n_features = np.shape(x)[1]
 
@@ -19,6 +21,22 @@ def plot_points(x, y):
 
     plt.xlabel('individual officers')
     plt.ylabel('corporate officers')
+
+
+def is_outlier(points, thresh=50):
+    """
+    mark all points over a threshold as outliers
+    """
+    if len(points.shape) == 1:
+        points = points[:,None]
+    median = np.median(points, axis=0)
+    diff = np.sum((points - median)**2, axis=-1)
+    diff = np.sqrt(diff)
+    med_abs_deviation = np.median(diff)
+
+    modified_z_score = 0.6745 * diff / med_abs_deviation
+
+    return modified_z_score > thresh
 
 
 if __name__ == "__main__":
@@ -47,14 +65,23 @@ if __name__ == "__main__":
 
     y = np.reshape(y, (n_examples, ))
 
+    # Standardize the data to have a zero mean and a unit variance, as it is required by PCA
+    x_scaled = preprocessing.scale(x)
+
     # Do PCA decomposition in two components
     pca = PCA(n_components=2)
-    x_transformed = pca.fit_transform(x)
+
+    # Remove the outliers
+    filter_indexes = ~is_outlier(x_scaled)
+    x_scaled_filtered = x_scaled[filter_indexes]
+    y_filtered = y[filter_indexes]
+
+    x_transformed = pca.fit_transform(x_scaled_filtered)
 
     log.info('Explained variance ratio: {}'.format(pca.explained_variance_ratio_))
 
-    plt.figure(figsize=(12, 8))
-    plot_points(x_transformed, y)
+    plt.figure(figsize=(20, 5))
+    plot_points(x_transformed, y_filtered)
     plt.savefig(args.output_file)
 
     log.info('Applying PCA decomposition and creating 2D plot to visualize the data finished successfully!')
