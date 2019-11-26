@@ -5,7 +5,7 @@ from util.config import *
 import argparse
 import matplotlib.pyplot as plt
 
-log = logging.getLogger('data_visualization')
+log = logging.getLogger(__name__)
 
 
 def plot_points(x, y):

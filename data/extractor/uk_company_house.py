@@ -4,7 +4,7 @@ from util.mongodb import *
 from itertools import permutations
 import random
 
-log = logging.getLogger('uk_company_house')
+log = logging.getLogger(__name__)
 
 class UKCompanyHouse:
 
@@ -120,18 +120,18 @@ class UKCompanyHouse:
         # process company's officers
         company_officers = self.getCompanyOfficers(company_number)
         if company_officers is not None:
-            for officer in company_officers.get("items", []):
+            for officer in reversed(company_officers.get("items", [])):
                 self.getTroikaOfficers(officer, depth - 1)
 
     def getTroikaOfficers(self, officer, depth):
 
-        if depth is 0: return
+        log.debug('Current depth is {}'.format(depth))
 
         # get officer appointments
         officer_appointments = self.getOfficerAppointments(officer["links"]["officer"]["appointments"])
 
         if officer_appointments is not None:
-            for appointment in officer_appointments.get("items", []):
+            for appointment in reversed(officer_appointments.get("items", [])):
                 self.getTroikaCompany(appointment['appointed_to']['company_number'], depth)
 
     def getTroikaCompanyHouseData(self, start_company_number, depth):

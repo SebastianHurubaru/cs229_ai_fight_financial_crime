@@ -2,7 +2,7 @@ from util.config import *
 from sklearn.metrics import classification_report
 import numpy as np
 
-log = logging.getLogger('__name__')
+log = logging.getLogger(__name__)
 
 def printMetrics(data_set_type, y, y_pred):
     log.info('Got the following metrics for {} data set: {}'.format(data_set_type,

@@ -18,7 +18,7 @@ with open('/mnt/data/pycharm-projects/cs229/util/keys.txt', 'r') as file:
         API_KEYS.append((line[:-1], MAX_REQ_FOR_KEY))
 
 
-TIMEOUT=300 #seconds
+TIMEOUT=70 #seconds
 BASE_URL="https://api.companieshouse.gov.uk"
 
 MONGO_USERNAME='admin'

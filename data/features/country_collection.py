@@ -1,6 +1,6 @@
 from util.mongodb import *
 
-log = logging.getLogger('country_collection')
+log = logging.getLogger(__name__)
 
 mongodb_connection = MongoDBWrapper('cs229')
 
