@@ -4,7 +4,7 @@ from util.config import *
 from model.shared import *
 import argparse
 
-log = logging.getLogger('linear_logistic_regression')
+log = logging.getLogger(__name__)
 
 if __name__ == "__main__":
 

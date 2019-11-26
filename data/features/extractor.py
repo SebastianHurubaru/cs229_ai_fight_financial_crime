@@ -10,7 +10,7 @@ def dump_to_csv(values, columns, index_column_name, csv_file):
 
 if __name__ == "__main__":
 
-    log = logging.getLogger('country_collection')
+    log = logging.getLogger(__name__)
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-ff", "--features_file", help="csv file to save the inputs(features)", type=str,

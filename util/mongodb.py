@@ -2,7 +2,7 @@ from util.config import *
 from pymongo import MongoClient
 import urllib.parse
 
-log = logging.getLogger('mongodb')
+log = logging.getLogger(__name__)
 
 class MongoDBWrapper:
     
