@@ -42,28 +42,30 @@ def is_outlier(points, thresh=50):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-ff", "--features_file", help="csv file with the inputs(features)", type=str,
-                        default='/mnt/data/pycharm-projects/cs229/data/input/features_train_dev.csv')
-    parser.add_argument("-lf", "--labels_file", help="csv file with the labels(outputs)", type=str,
-                        default='/mnt/data/pycharm-projects/cs229/data/input/labels_train_dev.csv')
+    parser.add_argument("-if", "--input_file", help="csv file with the train and dev inputs(generation & labels)",
+                        type=str,
+                        default='/mnt/data/pycharm-projects/cs229/data/input/data_train_dev.csv')
     parser.add_argument("-of", "--output_file", help="png file with the data plot", type=str,
                         default='/mnt/data/pycharm-projects/cs229/data/input/2d_data_plot.png')
+    parser.add_argument("-ro", "--remove_outliers", help="remove outliers", type=bool,
+                        default=False)
+    parser.add_argument("-ot", "--outlier_threshold", help="outliers threshold", type=float,
+                        default=50)
     args = parser.parse_args()
 
     log.info('Starting the PCA decomposition to visualize the data')
 
-    # read the model features and labels
-    x_df = pd.read_csv(args.features_file)
-    y_df = pd.read_csv(args.labels_file)
+    # read the model generation and labels
+    train_dev_df = pd.read_csv(args.input_file)
 
-    x = x_df.values[:, 1:].astype('int64')
-    y = y_df.values[:, 1:].astype('int64')
+    x = train_dev_df.values[:, 1:-1].astype('float')
+    y = train_dev_df.values[:, -1].astype('int')
 
     n_examples = np.shape(x)[0]
     n_features = np.shape(x)[1]
-    n_outputs = np.shape(y)[1]
 
-    y = np.reshape(y, (n_examples, ))
+    # we are doing classification
+    n_outputs = 1
 
     # Standardize the data to have a zero mean and a unit variance, as it is required by PCA
     x_scaled = preprocessing.scale(x)
@@ -72,16 +74,20 @@ if __name__ == "__main__":
     pca = PCA(n_components=2)
 
     # Remove the outliers
-    filter_indexes = ~is_outlier(x_scaled)
-    x_scaled_filtered = x_scaled[filter_indexes]
-    y_filtered = y[filter_indexes]
+    if args.remove_outliers is True:
+        filter_indexes = ~is_outlier(x_scaled)
+        x_preprocessed = x_scaled[filter_indexes]
+        y_preprocessed = y[filter_indexes]
+    else:
+        x_preprocessed = x_scaled
+        y_preprocessed = y
 
-    x_transformed = pca.fit_transform(x_scaled_filtered)
+    x_transformed = pca.fit_transform(x_preprocessed)
 
     log.info('Explained variance ratio: {}'.format(pca.explained_variance_ratio_))
 
     plt.figure(figsize=(20, 5))
-    plot_points(x_transformed, y_filtered)
+    plot_points(x_transformed, y)
     plt.savefig(args.output_file)
 
     log.info('Applying PCA decomposition and creating 2D plot to visualize the data finished successfully!')
