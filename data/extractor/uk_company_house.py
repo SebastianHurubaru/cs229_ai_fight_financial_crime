@@ -25,6 +25,22 @@ class UKCompanyHouse:
 
         return company_list
 
+    def searchCompany(self, company_name):
+
+        params = {}
+        params['q'] = company_name
+
+        response = self.restClient.doRequest('/search/companies', params)
+        return response
+
+    def searchOfficer(self, officer_name):
+
+        params = {}
+        params['q'] = officer_name
+
+        response = self.restClient.doRequest('/search/officers', params)
+        return response
+
     def getCompanyProfile(self, company_number):
 
         response = self.restClient.doRequest('/company/' + company_number, None)
@@ -109,7 +125,7 @@ class UKCompanyHouse:
         log.info('Finished processing {} companies!'.format(processedCompanyItems))
 
 
-    def getTroikaCompany(self, company_number, depth):
+    def getSuspiciousCompany(self, company_number, depth):
 
         if depth is 0: return
 
@@ -121,9 +137,9 @@ class UKCompanyHouse:
         company_officers = self.getCompanyOfficers(company_number)
         if company_officers is not None:
             for officer in reversed(company_officers.get("items", [])):
-                self.getTroikaOfficers(officer, depth - 1)
+                self.getSuspiciousOfficer(officer, depth - 1)
 
-    def getTroikaOfficers(self, officer, depth):
+    def getSuspiciousOfficer(self, officer, depth):
 
         log.debug('Current depth is {}'.format(depth))
 
@@ -132,9 +148,37 @@ class UKCompanyHouse:
 
         if officer_appointments is not None:
             for appointment in reversed(officer_appointments.get("items", [])):
-                self.getTroikaCompany(appointment['appointed_to']['company_number'], depth)
+                self.getSuspiciousCompany(appointment['appointed_to']['company_number'], depth)
 
     def getTroikaCompanyHouseData(self, start_company_number, depth):
 
-        self.getTroikaCompany(start_company_number, depth)
+        self.getSuspiciousCompany(start_company_number, depth)
+
+    def searchAndGetCompanyHouseData(self, company_name, depth):
+
+        results = self.searchCompany(company_name)
+
+        # we are dealing with full name search so always get the first result
+        company_data = results['items'][0]
+        if company_data is not None:
+            log.info(f"Found officer {company_data['title']} when searching for {company_data}")
+            # self.getSuspiciousCompany(company_data['company_number'], depth)
+
+
+    def searchAndGetCompanyHouseDataOfficer(self, officer_name, depth):
+
+        no_hit = True
+        results = self.searchOfficer(officer_name)
+
+        # officers may appear with the same name but different ids ...
+        for officer_data in results['items']:
+            if officer_data is not None and \
+                ( officer_data['title'].casefold() == officer_name.casefold() or
+                  officer_data['title'].casefold().startswith(officer_name.casefold()) ):
+                log.info(f"Found officer {officer_data['title']} when searching for {officer_name}")
+                no_hit = False
+                # self.getSuspiciousOfficer(officer_data, depth)
+
+        if no_hit == True:
+            log.info(f"Could not find any matching officer when searching for {officer_name}")
 

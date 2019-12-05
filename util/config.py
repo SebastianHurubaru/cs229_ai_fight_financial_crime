@@ -23,3 +23,8 @@ BASE_URL="https://api.companieshouse.gov.uk"
 
 MONGO_USERNAME='admin'
 MONGO_PASSWORD='admin'
+
+DB_MAIN='cs229'
+DB_TROIKA='cs229_troika'
+DB_UK_BLACKLIST='cs220_uk_blacklist'
+DB_NON_UK_BLACKLIST='cs229_non_uk_blacklist'
