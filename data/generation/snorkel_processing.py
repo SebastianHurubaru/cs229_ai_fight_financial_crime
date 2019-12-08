@@ -9,8 +9,10 @@ ABSTAIN=-1
 NOT_FRAUDULENT=0
 FRAUDULENT=1
 
-db_connection = MongoDBWrapper('cs229')
-troika_db_connection = MongoDBWrapper('cs229_troika')
+db_connection = MongoDBWrapper(DB_MAIN)
+troika_db_connection = MongoDBWrapper(DB_TROIKA)
+uk_blacklist_db_connection = MongoDBWrapper(DB_UK_BLACKLIST)
+non_uk_blacklist_db_connection = MongoDBWrapper(DB_NON_UK_BLACKLIST)
 
 @labeling_function()
 def lf_ubo_is_company(company_features):
@@ -35,21 +37,27 @@ def lf_troika_company(company_features):
 
 
 @labeling_function()
-def lf_troika_company_and_ubo_is_not_company(company_features):
+def lf_uk_blacklisted_company(company_features):
 
-    troika_company_label = lf_troika_company(company_features)
-    ubo_is_company_label = lf_ubo_is_company(company_features)
+    if uk_blacklist_db_connection.findCompany(company_features.name) is True:
+        return FRAUDULENT
 
-    if troika_company_label == FRAUDULENT and ubo_is_company_label == NOT_FRAUDULENT:
-        return ABSTAIN
+    return NOT_FRAUDULENT
 
-    return troika_company_label | ubo_is_company_label
+
+@labeling_function()
+def lf_non_uk_blacklisted_company(company_features):
+
+    if non_uk_blacklist_db_connection.findCompany(company_features.name) is True:
+        return FRAUDULENT
+
+    return NOT_FRAUDULENT
 
 
 def generate_labels_with_snorkel(dataframe):
 
     # Define the set of labeling functions (LFs)
-    lfs = [lf_ubo_is_company, lf_troika_company, lf_troika_company_and_ubo_is_not_company]
+    lfs = [lf_ubo_is_company, lf_troika_company, lf_uk_blacklisted_company, lf_non_uk_blacklisted_company]
 
     # Apply the LFs to the unlabeled training data
     applier = PandasLFApplier(lfs)
