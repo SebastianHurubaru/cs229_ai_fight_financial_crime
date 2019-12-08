@@ -9,24 +9,41 @@ from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 
+def getDataFromSource(source, existing_company_numbers, existing_countries):
+
+    source_db_connection = MongoDBWrapper(source)
+
+    # Get all countries sorted in ascending order, append it to the existing list and remove duplicates
+    source_countries = source_db_connection.db.country.find({}, {'name': 1, '_id': 0}).sort([('name', 1)])
+    source_countries = list(set([countryDetector(country['name']) for country in source_countries]))
+    countries = list(set(existing_countries + source_countries))
+
+    # Get all company numbers sorted in ascending order and append it to the existing list
+    source_company_numbers = source_db_connection.db.company.find({}, {'company_number': 1, '_id': 0})
+    source_company_numbers = existing_company_numbers + [company['company_number'] for company in source_company_numbers]
+
+    return source_company_numbers, countries
+
 if __name__ == "__main__":
 
     log = logging.getLogger(__name__)
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-of", "--output_file", help="output csv file to save the inputs(generation) and label", type=str,
-                        default='/mnt/data/pycharm-projects/cs229/data/input/data.csv')
+                        default=ROOT_DIR + '/data/input/data.csv')
     parser.add_argument("-tp", "--test_percentage", help="how much of the data to be saved as test", type=float,
                         default='0.05')
+    parser.add_argument("-s", "--sources", help="list of data sources", type=str, nargs='+',
+                        default=['cs229', 'cs229_troika', 'cs229_uk_blacklist', 'cs229_non_uk_blacklist'])
     args = parser.parse_args()
 
-    countries = db_connection.db.country.find({}, {'name': 1, '_id': 0}).sort([('name', 1)])
-    countries = list(set([countryDetector(country['name']) for country in countries]))
+    company_numbers = []
+    countries = []
 
-    troika_countries = troika_db_connection.db.country.find({}, {'name': 1, '_id': 0}).sort([('name', 1)])
-    troika_countries = list(set([countryDetector(country['name']) for country in troika_countries]))
+    for source in args.sources:
+        company_numbers, countries = getDataFromSource(source, company_numbers, countries)
 
-    countries = list(set(countries + troika_countries))
+    # Sort the country names alphabetically
     countries.sort()
 
     # Create the inputs and labels dataframes
@@ -37,14 +54,7 @@ if __name__ == "__main__":
     countries_array = np.asarray(countries)
     n_countries = np.shape(countries_array)[0]
 
-    # Get all company numbers sorted in ascending order
-    company_numbers = db_connection.db.company.find({}, {'company_number': 1, '_id': 0})
-    troika_company_numbers = troika_db_connection.db.company.find({}, {'company_number': 1, '_id': 0})
-
-    company_numbers = [company['company_number'] for company in company_numbers] + [troika_company['company_number'] for troika_company in troika_company_numbers]
-
     log.info(f"Start extracting features for {len(company_numbers)} companies")
-    pass
 
     # For each company get the associated officers
     for company_number in tqdm(company_numbers):
@@ -87,7 +97,7 @@ if __name__ == "__main__":
 
     log.info(f"Start generating labels using snorkel for {len(inputs)} companies")
 
-    # Use snorkel to generate the labels programatically
+    # Use snorkel to generate the labels programmatically
     df = pd.DataFrame(inputs, columns=['company_number'] + countries + countries).set_index('company_number', drop=True)
 
     df = generate_labels_with_snorkel(df)
