@@ -30,7 +30,7 @@ def countryDetector(unidentifiedCountryName):
         signatureOfficialCountriesDict = dict()
         signatureNameCountryNameDict = dict()
         
-        officialCountriesDict = json.load(open(('/mnt/data/pycharm-projects/cs229/data/input/official_countries_dict.json')))
+        officialCountriesDict = json.load(open((ROOT_DIR + '/data/input/official_countries_dict.json')))
     
     
         invertedofficialCountriesDict=dict()
@@ -51,7 +51,7 @@ def countryDetector(unidentifiedCountryName):
     
         # Adding extra county name commonly used in our database 
         # from possible county name : ISO name
-        AdditionalCountryNameDict = json.load(open('/mnt/data/pycharm-projects/cs229/data/input/additional_country_name_dict.json'))
+        AdditionalCountryNameDict = json.load(open(ROOT_DIR + '/data/input/additional_country_name_dict.json'))
 
         for k, v in countryName2ISOCodeDict.items():
             signatureNameCountryNameDict[k] = computeVectorOfNumberOfLetters(k)

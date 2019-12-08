@@ -11,7 +11,7 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--type", help="type of extraction: random/troika/uk_blacklist/non_uk_blacklist", type=str, default='troika')
     parser.add_argument("-d", "--depth", help="how deep should we go when searching for troika companies recursively", type=int, default=20)
     parser.add_argument("-if", "--input_file", help="csv input file containing a list of companies",
-                        type=str, default='/mnt/data/pycharm-projects/cs229/data/input/UK_blacklist_companies.csv')
+                        type=str, default= ROOT_DIR + '/data/input/UK_blacklist_companies.csv')
     args = parser.parse_args()
 
     log.info("Starting {} extraction of UK Company House data".format(args.type))
