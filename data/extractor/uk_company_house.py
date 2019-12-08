@@ -143,8 +143,12 @@ class UKCompanyHouse:
 
         log.debug('Current depth is {}'.format(depth))
 
+        officer_appointments = None
         # get officer appointments
-        officer_appointments = self.getOfficerAppointments(officer["links"]["officer"]["appointments"])
+        if 'officer' in officer["links"] and 'appointments' in officer["links"]["officer"]:
+            officer_appointments = self.getOfficerAppointments(officer["links"]["officer"]["appointments"])
+        elif 'self' in officer["links"]:
+            officer_appointments = self.getOfficerAppointments(officer["links"]["self"])
 
         if officer_appointments is not None:
             for appointment in reversed(officer_appointments.get("items", [])):
@@ -156,14 +160,21 @@ class UKCompanyHouse:
 
     def searchAndGetCompanyHouseData(self, company_name, depth):
 
+        no_hit = True
         results = self.searchCompany(company_name)
 
-        # we are dealing with full name search so always get the first result
-        company_data = results['items'][0]
-        if company_data is not None:
-            log.info(f"Found officer {company_data['title']} when searching for {company_data}")
-            # self.getSuspiciousCompany(company_data['company_number'], depth)
+        for company_data in results['items']:
 
+            if company_data is not None:
+                log.info(f"Found company {company_data['title']} when searching for {company_name}")
+                no_hit = False
+                self.getSuspiciousCompany(company_data['company_number'], depth)
+
+            # we are dealing with full name search so always get the first result
+            break
+
+        if no_hit == True:
+            log.critical(f"Could not find any matching company when searching for {company_name}")
 
     def searchAndGetCompanyHouseDataOfficer(self, officer_name, depth):
 
@@ -177,8 +188,8 @@ class UKCompanyHouse:
                   officer_data['title'].casefold().startswith(officer_name.casefold()) ):
                 log.info(f"Found officer {officer_data['title']} when searching for {officer_name}")
                 no_hit = False
-                # self.getSuspiciousOfficer(officer_data, depth)
+                self.getSuspiciousOfficer(officer_data, depth)
 
         if no_hit == True:
-            log.info(f"Could not find any matching officer when searching for {officer_name}")
+            log.critical(f"Could not find any matching officer when searching for {officer_name}")
 

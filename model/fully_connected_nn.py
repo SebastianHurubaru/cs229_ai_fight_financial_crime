@@ -11,20 +11,22 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-if", "--input_file", help="csv file with the train and dev inputs(generation & labels)",
                         type=str,
-                        default='/mnt/data/pycharm-projects/cs229/data/input/data_train_dev.csv')
+                        default=ROOT_DIR + '/data/input/data_train_dev.csv')
     parser.add_argument("-ift", "--input_file_test", help="csv file with the test inputs(generation & labels)", type=str,
-                        default='/mnt/data/pycharm-projects/cs229/data/input/data_test.csv')
+                        default=ROOT_DIR + '/data/input/data_test.csv')
     parser.add_argument("-dp", "--dev_percentage", help="how much of the data to be saved as dev set", type=float,
                         default=0.05)
     parser.add_argument("-wf", "--weights_file", help="path to the weights file to be saved/loaded", type=str,
-                        default='/mnt/data/pycharm-projects/cs229/model/weights/fully_connected_nn.h5')
+                        default=ROOT_DIR + '/model/weights/fully_connected_nn.h5')
     parser.add_argument("-t", "--train", help="whether to train a new model or not", action='store_true')
     parser.add_argument("-bs", "--batch_size", help="batch size", type=int,
                         default=128)
     parser.add_argument("-e", "--epochs", help="number of epochs to train for", type=int,
-                        default=500)
-    parser.add_argument("-hu", "--hidden_units", help="base number of hidden units", type=int,
-                        default=32)
+                        default=50)
+    parser.add_argument("-hu", "--hidden_units", help="number of hidden units", type=int,
+                        default=512)
+    parser.add_argument("-l", "--layers", help="number of layers", type=int,
+                        default=2)
     parser.add_argument("-v", "--verbose", help="verbose", type=int,
                         default=2)
     args = parser.parse_args()
@@ -62,20 +64,16 @@ if __name__ == "__main__":
 
     if args.train is True:
 
-        model = tf.keras.models.Sequential([
-            tf.keras.layers.Input(batch_shape=(None, None, n_features)),
-            tf.keras.layers.Dense(args.hidden_units * 2 ** 4, kernel_initializer='glorot_normal',
-                                  activation='relu'),
-            tf.keras.layers.Dense(args.hidden_units * 2 ** 3, kernel_initializer='glorot_normal',
-                                  activation='relu'),
-            tf.keras.layers.Dense(args.hidden_units * 2 ** 1, kernel_initializer='glorot_normal',
-                                  activation='relu'),
-            tf.keras.layers.Dense(args.hidden_units * 2 ** (-1), kernel_initializer='glorot_normal',
-                                  activation='relu'),
-            tf.keras.layers.Dense(args.hidden_units * 2 ** (-3), kernel_initializer='glorot_normal',
-                                  activation='relu'),
-            tf.keras.layers.Dense(1, kernel_initializer='glorot_normal', activation='sigmoid')
-        ])
+        layers = [tf.keras.layers.Input(batch_shape=(None, None, n_features))]
+
+        # add the number of hidden layers given as a parameter
+        for _ in range(args.layers):
+            layers = layers + [tf.keras.layers.Dense(args.hidden_units, kernel_initializer='glorot_normal',
+                                                     activation='relu')]
+
+        layers = layers + [tf.keras.layers.Dense(1, kernel_initializer='glorot_normal', activation='sigmoid')]
+
+        model = tf.keras.models.Sequential(layers)
 
         adam_optimizer = tf.keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, amsgrad=False)
         model.compile(optimizer=adam_optimizer,
@@ -95,6 +93,8 @@ if __name__ == "__main__":
     y_test = y_test.reshape(n_test_examples, 1, n_outputs)
 
     # compute the metrics for training, dev and test set
+    log.info(f"Start generating the metrics for Fully Connected NN")
+
     y_pred_train = model.predict(x_train, batch_size=args.batch_size)
     printMetrics('train', np.reshape(y_train, (-1, 1)), np.reshape((y_pred_train >= 0.5).astype(int), (-1, 1)))
 
@@ -103,3 +103,5 @@ if __name__ == "__main__":
 
     y_pred_test = model.predict(x_test, batch_size=args.batch_size)
     printMetrics('test', np.reshape(y_test, (-1, 1)), np.reshape((y_pred_test >= 0.5).astype(int), (-1, 1)))
+
+    log.info(f"Ended generating the metrics for Fully Connected NN")
