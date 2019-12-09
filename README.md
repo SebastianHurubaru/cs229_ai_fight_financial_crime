@@ -14,6 +14,19 @@ Given the number of countries, we also created two other vectors:
 US Virgin Islands the "Blacklist") as at 17 May 2019: https://ec.europa.eu/taxation_customs/sites/taxation/files/eu_list_update_17_05_2019_en.pdf
 (ii) a vector with a mix of regions and individual countries (aggregating Africa, Antarctica, North America, South America, Asia, other Oceania and Middle-East), and providing detailed countries for Europe, Eastern Europe and Central Asia, and Caribbean.
 
-4. The dataset has been split between train  [], dev [], and test [].
+4.Snorkel
 
-5. The following models have been applied on the train and dev datasets.
+5. The dataset has been split between train  [], dev [], and test [].
+
+6. The following models have been applied on the train and dev datasets.
+-SVM;
+-...
+
+
+7. The most promising models were [model1], [model2] and [model3], with the following results:
+[insert table]
+
+On the test, we obtained the following performance:
+[insert table]
+
+8. Discussion and conclusion
