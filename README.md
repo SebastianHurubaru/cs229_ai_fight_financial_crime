@@ -29,4 +29,7 @@ US Virgin Islands the "Blacklist") as at 17 May 2019: https://ec.europa.eu/taxat
 On the test, we obtained the following performance:
 [insert table]
 
-8. Discussion and conclusion
+8. Testing our model on a hand-picked data to assess performance
+
+
+9. Discussion and conclusion
