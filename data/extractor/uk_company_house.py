@@ -7,8 +7,19 @@ import random
 log = logging.getLogger(__name__)
 
 class UKCompanyHouse:
+    """
+        Wrapper for extracting various information from the UK Companies House
 
+    """
     def __init__(self, db_name, max_company_numbers=300000):
+
+        """
+            Initializer of the class object
+
+            Args:
+                db_name -- mongo database name in which to save the data
+                max_company_numbers -- max number of companies to generate
+        """
 
         self.restClient = RESTClient(API_KEYS, TIMEOUT, BASE_URL)
         self.max_company_numbers = max_company_numbers
@@ -16,6 +27,14 @@ class UKCompanyHouse:
 
 
     def generateCompanyNumbers(self, ):
+
+        """
+            Initializer of the class object
+
+            Args:
+                db_name -- mongo database name in which to save the data
+                max_company_numbers -- max number of companies to generate
+        """
 
         englandAndWales = [''.join(tuples) for tuples in list(permutations('0123456789', 8))]
         englandAndWalesLlps = ['OC' + ''.join(gen_number) for gen_number in list(permutations('0123456789', 6))]

@@ -6,9 +6,24 @@ from util.config import *
 
 log = logging.getLogger(__name__)
 
+
 class RESTClient:
+    """
+    Simple implementation of a REST Client
+
+    """
 
     def __init__(self, api_keys, timeout, base_url):
+
+        """
+            Class initializer
+
+            Args:
+                  api_keys -- list of API keys to be used
+                  timeout -- how much to timeout after an access related error
+                  base_url -- base URL from which to start all the requests
+        """
+
         self.api_keys = api_keys
         self.timeout = timeout
         self.base_url = base_url
@@ -27,6 +42,12 @@ class RESTClient:
 
     def doTimeout(self):
 
+        """
+            Perform timeout. Resets the info counter of API calls done since the last timeout,
+             as well as the session
+
+        """
+
         log.info('Executed {} calls until timeout'.format(self.calls_to_timeout))
         self.calls_to_timeout = 0
 
@@ -35,6 +56,13 @@ class RESTClient:
 
 
     def resetSession(self, get_new_api_key=True):
+
+        """
+            Resets the session
+
+            Args:
+                  get_new_api_key -- whether to use a new API Key
+        """
         self.session.close()
         self.session = requests.Session()
 
@@ -43,6 +71,12 @@ class RESTClient:
 
 
     def getNextApiKey(self):
+
+        """
+            Gets a new API key, configured with it's correspondent access rights.
+            If all keys are already used, start from the first one.
+
+        """
 
         self.resetSession(get_new_api_key=False)
 
@@ -56,6 +90,19 @@ class RESTClient:
 
 
     def doRequest(self, partial_url, params):
+
+        """
+            Make the HTTP request.
+            If UK Company House service restricted access to the host, do a timeout and continue.
+
+            Args:
+                  partial_url -- the URL used together with the base one to form the full request URL
+                  params -- map of HTTP request parameters
+
+            Returns:
+                responseJson -- the HTTP response in Json format
+
+        """
 
         self.calls_to_timeout += 1
 

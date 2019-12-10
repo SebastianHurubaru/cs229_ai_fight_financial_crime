@@ -44,7 +44,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-if", "--input_file", help="csv file with the train and dev inputs(generation & labels)",
                         type=str,
-                        default=ROOT_DIR + '/data/input/data_train_dev.csv')
+                        default=ROOT_DIR + '/data/input/full_countries_data_train_dev.csv')
     parser.add_argument("-of", "--output_file", help="png file with the data plot", type=str,
                         default=ROOT_DIR + '/data/input/2d_data_plot.png')
     parser.add_argument("-ro", "--remove_outliers", help="remove outliers", type=bool,
