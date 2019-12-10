@@ -9,13 +9,30 @@ from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 
-def getDataFromSource(source, existing_company_numbers, existing_countries):
+# load the mixed and regions dictionaries
+mixed_countries = json.load(open(ROOT_DIR + '/data/input/mixed_countries_regions_dict.json'))
+regions = json.load(open(ROOT_DIR + '/data/input/regions_dict.json'))
+
+def getDataFromSource(source, existing_company_numbers, existing_countries, extraction_type):
 
     source_db_connection = MongoDBWrapper(source)
 
     # Get all countries sorted in ascending order, append it to the existing list and remove duplicates
     source_countries = source_db_connection.db.country.find({}, {'name': 1, '_id': 0}).sort([('name', 1)])
-    source_countries = list(set([countryDetector(country['name']) for country in source_countries]))
+
+    new_countries = []
+    for country in source_countries:
+
+        country_name, country_iso_code = countryDetector(country['name'])
+
+        if extraction_type == 'mixed':
+            country_name = mixed_countries[country_iso_code]
+        elif extraction_type == 'regions':
+            country_name = regions[country_iso_code]
+
+        new_countries.append(country_name)
+
+    source_countries = list(set(new_countries))
     countries = list(set(existing_countries + source_countries))
 
     # Get all company numbers sorted in ascending order and append it to the existing list
@@ -32,16 +49,18 @@ if __name__ == "__main__":
     parser.add_argument("-of", "--output_file", help="output csv file to save the inputs(generation) and label", type=str,
                         default=ROOT_DIR + '/data/input/data.csv')
     parser.add_argument("-tp", "--test_percentage", help="how much of the data to be saved as test", type=float,
-                        default='0.05')
+                        default=0.05)
     parser.add_argument("-s", "--sources", help="list of data sources", type=str, nargs='+',
                         default=['cs229', 'cs229_troika', 'cs229_uk_blacklist', 'cs229_non_uk_blacklist'])
+    parser.add_argument("-t", "--type", help="Type of feature extraction", type=str, choices=['full', 'regions', 'mixed'],
+                        default='full')
     args = parser.parse_args()
 
     company_numbers = []
     countries = []
 
     for source in args.sources:
-        company_numbers, countries = getDataFromSource(source, company_numbers, countries)
+        company_numbers, countries = getDataFromSource(source, company_numbers, countries, args.type)
 
     # Sort the country names alphabetically
     countries.sort()
@@ -79,6 +98,13 @@ if __name__ == "__main__":
                     officer_country = officer['country_of_residence']
                 elif 'address' in officer and 'country' in officer['address']:
                     officer_country = officer['address']['country']
+
+                officer_country, officer_country_iso_code = countryDetector(officer_country)
+
+                if args.type == 'mixed':
+                    officer_country = mixed_countries[officer_country_iso_code]
+                elif args.type == 'regions':
+                    officer_country = regions[officer_country_iso_code]
 
                 # are we a corporate officer or a person
                 if 'identification' in officer:

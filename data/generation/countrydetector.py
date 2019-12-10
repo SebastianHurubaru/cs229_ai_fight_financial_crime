@@ -112,9 +112,9 @@ def countryDetector(unidentifiedCountryName):
     # Compute the closest country
     closest = findClosetCountryNames(unidentifiedCountryName, signatureNameCountryNameDict, numberTopN=1)
     try:
-        closestToPrint = officialCountriesDict[countryName2ISOCodeDict[closest[0][0]]]
+        closestToPrint, closestToPrintISO = officialCountriesDict[countryName2ISOCodeDict[closest[0][0]]], countryName2ISOCodeDict[closest[0][0]]
     except:
-        closestToPrint = officialCountriesDict[AdditionalCountryNameDict[closest[0][0]]]
+        closestToPrint, closestToPrintISO = officialCountriesDict[AdditionalCountryNameDict[closest[0][0]]], AdditionalCountryNameDict[closest[0][0]]
 
     # Return name of the closest country
-    return closestToPrint
+    return closestToPrint, closestToPrintISO
