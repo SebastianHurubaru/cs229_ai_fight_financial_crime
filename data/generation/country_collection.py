@@ -3,6 +3,12 @@ import argparse
 
 log = logging.getLogger(__name__)
 
+
+"""
+Simple program to create a collection of distinct countries of all officers and PSCs 
+
+"""
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
