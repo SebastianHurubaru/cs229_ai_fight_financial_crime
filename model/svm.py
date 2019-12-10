@@ -10,10 +10,10 @@ log = logging.getLogger(__name__)
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-if", "--input_file", help="csv file with the train and dev inputs(generation & labels)", type=str,
-                        default=ROOT_DIR + '/data/input/data_train_dev.csv')
-    parser.add_argument("-ift", "--input_file_test", help="csv file with the test inputs(generation & labels)", type=str,
-                        default=ROOT_DIR + '/data/input/data_test.csv')
+    parser.add_argument("-if", "--input_file", help="csv file with the train and dev inputs(features & labels)", type=str,
+                        default=ROOT_DIR + '/data/input/full_countries_data_train_dev.csv')
+    parser.add_argument("-ift", "--input_file_test", help="csv file with the test inputs(features & labels)", type=str,
+                        default=ROOT_DIR + '/data/input/full_countries_data_test.csv')
     parser.add_argument("-dp", "--dev_percentage", help="how much of the data to be saved as dev set", type=float,
                         default='0.05')
     parser.add_argument("-wf", "--weights_file", help="path to the weights file to be saved/loaded", type=str,
