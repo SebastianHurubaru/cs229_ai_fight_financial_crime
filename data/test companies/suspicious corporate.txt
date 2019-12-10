@@ -1,0 +1,13 @@
+nameCompany, countryRegistration, companyNumber, extraInfo, comment
+LCF CONVERSIONS UK LIMITED, GB, 09773953, money laundering
+MANAGEMENT AND PROPERTY INVESTMENT LIMITED, GB, 05932280, other
+CORLEONE CAFFE TRADING LIMITED, GB, 09700222, Italian mafia
+MANAGEMENT UNICAPITAL LTD, GB, 06255336, mafia, https://opencorporates.com/companies/gb/06255336
+MAGNOLIA FUNDACTION UK LIMITED, GB, 05806726, mafia, https://opencorporates.com/companies/gb/05806726
+BUSINESS BANK ITALY LTD, GB, 06623736, mafia, https://opencorporates.com/companies/gb/06623736
+INVESTNOW LTD, GB, 05774499, mafia, https://opencorporates.com/companies/gb/05774499,
+MINERVA FILM PRODUCTION & DISTRIBUTION COMPANY LIMITED, 05758535, mafia, https://opencorporates.com/companies/gb/05758535
+FINANCIALCAST LTD, 05916426, mafia, https://opencorporates.com/companies/gb/05916426
+CRI DEVELOPMENT & RESEARCH LIMITED, 10450705, mafia, https://opencorporates.com/companies/gb/10450705
+INTERCONTINENTAL FINANCIAL DEVELOPMENTS PLC, 05654551, mafia, https://opencorporates.com/companies/gb/05654551
+GICLA INTERNATIONAL LIMITED, 05774596, mafia, https://opencorporates.com/companies/gb/05774596
