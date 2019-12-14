@@ -15,7 +15,8 @@ US Virgin Islands the "Blacklist") as at 17 May 2019: https://ec.europa.eu/taxat
 (ii) a vector with a mix of regions and individual countries (aggregating Africa, Antarctica, North America, South America, Asia, other Oceania and Middle-East), and providing detailed countries for Europe, Eastern Europe and Central Asia, and Caribbean.
 
 4.Snorkel
-
+  Created four labeling functions and generated the final label for each data point.
+  
 5. The dataset has been split between train  90%, dev 5%, and test 5%.
 
 6. The following models have been applied on the train and dev datasets.
