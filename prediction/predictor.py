@@ -5,6 +5,10 @@ log = logging.getLogger(__name__)
 
 class Predictor(object):
 
+    """
+    Interface for implementing prediction task
+    """
+
     def __init__(self, **kwargs):
 
         self.weights_file = kwargs.pop('weights_file')
@@ -13,11 +17,19 @@ class Predictor(object):
         self.load_model()
 
     def load_model(self):
-
+        """
+        Loads a model
+        :return:
+        """
         self.model = None
 
     def load_data(self, input_file):
 
+        """
+        Loads the features and labels data from a csv file
+        :param input_file: csv file containing the data
+        :return: features and labels
+        """
         self.input_df = pd.read_csv(input_file)
 
         self.x = self.input_df.values[:, 1:-1].astype('float')
@@ -27,15 +39,29 @@ class Predictor(object):
 
     def transform_data(self):
 
+        """
+        Transforms the data
+        :return: transformed features and labels
+        """
         return self.x, self.y
 
 
     def predict(self):
 
+        """
+        Perform prediction
+
+        :return: predicted labels
+        """
         return None
 
 
     def save_predictions(self):
+
+        """
+        Saves the features, true and predicted labels to a file
+        :return:
+        """
 
         n_examples = np.shape(self.x)[0]
 
@@ -50,6 +76,12 @@ class Predictor(object):
 
 
     def explain(self):
+
+        """
+        Explain the decision of the prediction
+
+        :return:
+        """
 
         return None
 

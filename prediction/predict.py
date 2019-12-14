@@ -6,6 +6,10 @@ import argparse
 
 log = logging.getLogger(__name__)
 
+"""
+    Program that does prediction on some given data using a specified model
+"""
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()

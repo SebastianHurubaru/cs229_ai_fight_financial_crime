@@ -6,6 +6,10 @@ import argparse
 
 log = logging.getLogger(__name__)
 
+"""
+    Program that trains a NN with fully connected layers only
+"""
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()

@@ -46,6 +46,14 @@ class UKCompanyHouse:
 
     def searchCompany(self, company_name):
 
+        """
+        Searches in the UK Companies House database for a company by name
+
+        :param company_name: name of the company to search for
+
+        :return: json dictionary with the results from the UK Companies House
+        """
+
         params = {}
         params['q'] = company_name
 
@@ -53,6 +61,14 @@ class UKCompanyHouse:
         return response
 
     def searchOfficer(self, officer_name):
+
+        """
+        Searches in the UK Companies House database for an officer by name
+
+        :param officer_name: name of the officer to search for
+
+        :return: json dictionary with the results from the UK Companies House
+        """
 
         params = {}
         params['q'] = officer_name
@@ -62,26 +78,65 @@ class UKCompanyHouse:
 
     def getCompanyProfile(self, company_number):
 
+        """
+        Given a company number get the company profile data from the UK Companies House
+
+        :param company_number: company number to get the data for
+        :return: json dictionary with the company profile data
+        """
         response = self.restClient.doRequest('/company/' + company_number, None)
         return response
 
     def getCompanyPersonsWithSignificantControl(self, company_number):
+
+        """
+        Given a company number get the company's persons with significant control from UK Companies House
+
+        :param company_number: company number to get the data for
+        :return: json dictionary with the company's PSCs
+        """
 
         response = self.restClient.doRequest('/company/' + company_number + '/persons-with-significant-control', None)
         return response
 
     def getCompanyOfficers(self, company_number):
 
+        """
+        Given a company number get the company's officers
+
+        :param company_number: company number to get the data for
+        :return: json dictionary with the company's officers
+        """
+
         response = self.restClient.doRequest('/company/' + company_number + '/officers', None)
         return response
 
     def getOfficerAppointments(self, appointment_link):
+
+        """
+        For a given officer appointment link, get the full data associated with it
+
+        :param appointment_link: relative link to a specific officer appointment
+        :return: json dictionary with the officer appointment data
+        """
 
         response = self.restClient.doRequest(appointment_link, None)
         return response
 
 
     def processCompany(self, company_number):
+
+        """
+        For a given company number get :
+            - it's officers
+            - all it's officers appointments
+            - it's PSCs
+
+        Save all this data to MongoDB
+
+        :param company_number: company number for which to get associated data
+        :return: True if successful, False otherwise
+        """
 
         # process company profile
         company_profile = self.getCompanyProfile(company_number)
@@ -116,6 +171,12 @@ class UKCompanyHouse:
 
     def getRandomCompanyHouseData(self):
 
+        """
+        For a randomly generated list of company numbers get data for a specified max number of companies
+
+        :return: Nothing
+        """
+
         processedCompanyItems = 0
 
         company_numbers = self.generateCompanyNumbers()
@@ -146,6 +207,15 @@ class UKCompanyHouse:
 
     def getSuspiciousCompany(self, company_number, depth):
 
+        """
+        For a given company number get all the data associated with it and recursively
+        go one level deeper for all of it's officers
+
+        :param company_number: company number to get the data for
+        :param depth: current depth in the recursive tree
+        :return: Nothing
+        """
+
         if depth is 0: return
 
         # save company data if not already processed
@@ -159,6 +229,15 @@ class UKCompanyHouse:
                 self.getSuspiciousOfficer(officer, depth - 1)
 
     def getSuspiciousOfficer(self, officer, depth):
+
+        """
+        For a given officer and depth get all it's companies for which the officer is acting for and
+        recursively go one level deeper
+
+        :param officer: officer for which to get the companies acting for
+        :param depth: current depth in the recursive tree
+        :return: Nothing
+        """
 
         log.debug('Current depth is {}'.format(depth))
 
@@ -175,9 +254,27 @@ class UKCompanyHouse:
 
     def getTroikaCompanyHouseData(self, start_company_number, depth):
 
+        """
+        Starting from a company knowing it was involved in the Troika laundromat, recursively
+        get it's officers and the companies for which the officers are acting for
+
+        :param start_company_number: company from which to start
+        :param depth: how deep the recursive tree should go to
+
+        :return:
+        """
+
         self.getSuspiciousCompany(start_company_number, depth)
 
     def searchAndGetCompanyHouseData(self, company_name, depth):
+
+        """
+        Search for a company given it's full name and download the required data from the UK Companies House
+
+        :param company_name: the company name to search and get the data for
+        :param depth: depth of the recursive tree
+        :return: Nothing
+        """
 
         no_hit = True
         results = self.searchCompany(company_name)
@@ -196,6 +293,14 @@ class UKCompanyHouse:
             log.critical(f"Could not find any matching company when searching for {company_name}")
 
     def searchAndGetCompanyHouseDataOfficer(self, officer_name, depth):
+
+        """
+        Given an officer name for all the findings recursively get the companies for which the officer is appointed to
+
+        :param officer_name: name of the officer searched for
+        :param depth: dept of recursive tree
+        :return:
+        """
 
         no_hit = True
         results = self.searchOfficer(officer_name)

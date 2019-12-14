@@ -11,13 +11,32 @@ log = logging.getLogger(__name__)
 
 np.random.seed(229)
 
+
 def printMetrics(data_set_type, y, y_pred):
+
+    """
+    Prints the metrics using scikit-learn to the application log
+
+    :param data_set_type: data set type: train/dev/test
+    :param y: true labels
+    :param y_pred: predicted labels
+    :return:
+    """
     log.info('Got the following metrics for {} data set: {}'.format(data_set_type,
                                                                     classification_report(y,
                                                                                           y_pred)))
 
 
 def generate_and_plot_confusion_matrix(y, y_pred, output_file=None):
+
+    """
+    Generates the confusion matrix using scikit-learn and plots it using seaborn
+
+    :param y: true labels
+    :param y_pred: predicted labels
+    :param output_file: if supplied the plot will be saved to it, otherwise it will just be displayed
+    :return:
+    """
 
     cm = confusion_matrix(y, y_pred)
 

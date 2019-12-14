@@ -15,6 +15,18 @@ regions = json.load(open(ROOT_DIR + '/data/input/regions_dict.json'))
 
 def getDataFromSource(source, existing_company_numbers, existing_countries, extraction_type):
 
+    """
+    For a given data source (MongoDB) get all the countries and companies available
+
+    :param source: MongoDB database
+    :param existing_company_numbers: list of companies to append the data from the given source to
+    :param existing_countries: list of countries to append the data from the given source to
+    :param extraction_type: type of features extraction: full countries/regions/mix
+
+    :return:
+        source_company_numbers - list of company numbers from the source concatenated to existing_company_numbers
+        countries - list of countries from the given source concatenated to existing_countries
+    """
     source_db_connection = MongoDBWrapper(source)
 
     # Get all countries sorted in ascending order, append it to the existing list and remove duplicates
@@ -40,6 +52,13 @@ def getDataFromSource(source, existing_company_numbers, existing_countries, extr
     source_company_numbers = existing_company_numbers + [company['company_number'] for company in source_company_numbers]
 
     return source_company_numbers, countries
+
+"""
+
+    Program to extract the features from different MongoDB databases
+    
+"""
+
 
 if __name__ == "__main__":
 

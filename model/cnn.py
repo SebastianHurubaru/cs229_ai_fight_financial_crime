@@ -6,6 +6,10 @@ import argparse
 
 log = logging.getLogger(__name__)
 
+"""
+    Program that trains a CNN LeNet-5 1D customized version
+"""
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()

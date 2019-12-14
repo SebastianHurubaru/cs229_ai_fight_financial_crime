@@ -5,6 +5,11 @@ from data.extractor.uk_company_house import UKCompanyHouse
 
 log = logging.getLogger(__name__)
 
+
+"""
+    Program to start data extraction from the UK Companies House 
+"""
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()

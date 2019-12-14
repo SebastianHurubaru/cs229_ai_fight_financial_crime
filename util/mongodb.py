@@ -5,6 +5,10 @@ import urllib.parse
 log = logging.getLogger(__name__)
 
 class MongoDBWrapper:
+
+    """
+    Class wrapping the calls to the MongoDB
+    """
     
     def __init__(self, db_name):
 

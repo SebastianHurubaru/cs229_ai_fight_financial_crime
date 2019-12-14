@@ -7,6 +7,10 @@ import pickle
 
 log = logging.getLogger(__name__)
 
+"""
+    Program that trains SVM models using scikit-learn module
+"""
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()

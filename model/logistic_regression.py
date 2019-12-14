@@ -6,6 +6,10 @@ import argparse
 
 log = logging.getLogger(__name__)
 
+"""
+    Program that trains a logistic regression model implemented as NN to leverage the GPU capability of Tensorflow 2.0
+"""
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
