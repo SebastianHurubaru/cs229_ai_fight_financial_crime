@@ -16,20 +16,15 @@ US Virgin Islands the "Blacklist") as at 17 May 2019: https://ec.europa.eu/taxat
 
 4.Snorkel
 
-5. The dataset has been split between train  [], dev [], and test [].
+5. The dataset has been split between train  90%, dev 5%, and test 5%.
 
 6. The following models have been applied on the train and dev datasets.
--SVM;
--...
+-SVM: sigmoid, gaussian, 5th and 10th degree polynomial kernels
+-Logistic regression
+-NN: containing just fully connected layers with 2, 5 and 10 hidden layers
+-CNN: LeNet-5 variation for 1D data 
 
-
-7. The most promising models were [model1], [model2] and [model3], with the following results:
-[insert table]
-
-On the test, we obtained the following performance:
-[insert table]
-
-8. Testing our model on a hand-picked data to assess performance
-
+7. The most promising models were CNN, 2 hidden layers NN and SVM/Logistic regression
 
 9. Discussion and conclusion
+We could show that a model can detect patterns in the data indicating companies andlimited partnerships more likely to be involved in money-laundering using the residence and legalpersonality (individual or corporate) of its officers and beneficial owners. 
