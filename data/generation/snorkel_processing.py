@@ -17,6 +17,13 @@ non_uk_blacklist_db_connection = MongoDBWrapper(DB_NON_UK_BLACKLIST)
 @labeling_function()
 def lf_ubo_is_company(company_features):
 
+    """
+    Snorkel labeling function that based on the type of the PSC labels the company data
+
+    :param company_features: dictionary with the company features
+    :return: FRAUDULENT or NOT_FRAUDULENT
+    """
+
     company_pscs = db_connection.db.person_with_significant_control.find({'$text': {"$search": company_features.name}},
                                                                          {'kind': 1, '_id': 0})
     if company_pscs is not None:
@@ -30,6 +37,13 @@ def lf_ubo_is_company(company_features):
 @labeling_function()
 def lf_troika_company(company_features):
 
+    """
+    Snorkel labeling function that based whether the company was part of the Troika laundromat labels the data accordingly
+
+    :param company_features: dictionary with the company features
+    :return: FRAUDULENT or NOT_FRAUDULENT
+    """
+
     if troika_db_connection.findCompany(company_features.name) is True:
         return FRAUDULENT
 
@@ -38,7 +52,12 @@ def lf_troika_company(company_features):
 
 @labeling_function()
 def lf_uk_blacklisted_company(company_features):
+    """
+        Snorkel labeling function that based whether the UK company was blacklisted, labels the data accordingly
 
+        :param company_features: dictionary with the company features
+        :return: FRAUDULENT or NOT_FRAUDULENT
+    """
     if uk_blacklist_db_connection.findCompany(company_features.name) is True:
         return FRAUDULENT
 
@@ -47,7 +66,13 @@ def lf_uk_blacklisted_company(company_features):
 
 @labeling_function()
 def lf_non_uk_blacklisted_company(company_features):
+    """
+        Snorkel labeling function that based whether a Non-UK company was blacklisted, labels the data accordingly
 
+        :param company_features: dictionary with the company features
+        :return: FRAUDULENT or NOT_FRAUDULENT
+
+    """
     if non_uk_blacklist_db_connection.findCompany(company_features.name) is True:
         return FRAUDULENT
 
@@ -55,6 +80,12 @@ def lf_non_uk_blacklisted_company(company_features):
 
 
 def generate_labels_with_snorkel(dataframe):
+
+    """
+    Labels the full data using Snorkel
+    :param dataframe: Pandas dataframe containing all data
+    :return: dataframe extended with a label column
+    """
 
     # Define the set of labeling functions (LFs)
     lfs = [lf_ubo_is_company, lf_troika_company, lf_uk_blacklisted_company, lf_non_uk_blacklisted_company]

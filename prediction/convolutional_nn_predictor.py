@@ -6,17 +6,30 @@ log = logging.getLogger(__name__)
 
 class CNNPredictor(Predictor):
 
+    """
+    Class implementing the Predictor interface for CNNs
+    """
+
     def __init__(self, **kwargs):
 
-        super().__init__(kwargs)
+        super().__init__(**kwargs)
         self.batch_size = kwargs.pop('batch_size')
 
     def load_model(self):
+        """
+        Loads the model from a file to the object's variable model
+        :return:
+        """
 
         self.model = tf.keras.models.load_model(self.weights_file)
 
 
     def transform_data(self):
+
+        """
+        transforms the data to the shapes required by Keras/TensorFlow for CNNs
+        :return: transformed features and labels
+        """
 
         n_examples = np.shape(self.x)[0]
         n_features = np.shape(self.x)[1]
@@ -32,6 +45,12 @@ class CNNPredictor(Predictor):
 
 
     def predict(self):
+
+        """
+        Predict using the loaded model
+
+        :return: predicted labels
+        """
 
         x_trans, y_trans = self.transform_data()
 

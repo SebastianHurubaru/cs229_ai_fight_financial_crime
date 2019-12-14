@@ -39,6 +39,9 @@ def is_outlier(points, thresh=50):
     return modified_z_score > thresh
 
 
+"""
+    Using Principal Component Analysis, reduce the data dimensionality to 2D in order to visualize it
+"""
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
