@@ -13,6 +13,9 @@ if __name__ == "__main__":
                         default=ROOT_DIR + '/data/input/full_countries_data_test.csv')
     parser.add_argument("-of", "--output_file", help="csv file with the inputs(features & labels) and outputs(predicted labels)", type=str,
                         default=ROOT_DIR + '/data/output/full_countries_data_test.csv')
+    parser.add_argument("-pof", "--plot_output_file",
+                        help="output file with the confusion matrix", type=str,
+                        default=ROOT_DIR + '/data/output/full_countries_logistic_regression_cm.png')
     parser.add_argument("-pt", "--predictor_type", help="type of predictor to be used", type=str,
                         choices=['svm', 'fcnn', 'cnn'],
                         default='svm')
@@ -31,9 +34,13 @@ if __name__ == "__main__":
 
     # compute the metrics
     log.info(f"Start generating the metrics")
-
     predictor.predict()
+
     printMetrics('train', np.reshape(predictor.y, (-1, 1)), np.reshape(predictor.y_pred, (-1, 1)))
+    generate_and_plot_confusion_matrix(np.reshape(predictor.y, (-1, 1)), np.reshape(predictor.y_pred, (-1, 1)),
+                                       args.plot_output_file)
+
+    explainings = predictor.explain()
 
     log.info(f"Ended generating the metrics")
 

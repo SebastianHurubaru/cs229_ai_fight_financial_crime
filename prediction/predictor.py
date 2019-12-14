@@ -1,4 +1,5 @@
 from util.config import *
+import numpy as np
 
 log = logging.getLogger(__name__)
 
@@ -36,9 +37,22 @@ class Predictor(object):
 
     def save_predictions(self):
 
-        self.input_df['predicted_label'] = self.y_pred
+        n_examples = np.shape(self.x)[0]
 
-        self.input_df.to_csv(self.output_file, index=True, header=True)
+        output = np.concatenate((self.input_df['company_number'].values.reshape(n_examples, -1), self.x.reshape(n_examples, -1), self.y.reshape(n_examples, -1)), axis=1)
+        self.output_df = pd.DataFrame(output, columns=self.input_df.columns).set_index(
+            'company_number',
+            drop=True)
+
+        self.output_df['predicted_label'] = self.y_pred
+
+        self.output_df.to_csv(self.output_file, index=True, header=True)
+
+
+    def explain(self):
+
+        return None
+
 
 def get_predictor(predictor_type):
 
@@ -46,10 +60,10 @@ def get_predictor(predictor_type):
         from prediction.svm_predictor import SVMPredictor
         return SVMPredictor
     elif predictor_type == 'fcnn':
-        from prediction.svm_predictor import FCNNPredictor
+        from prediction.fully_connected_nn_predictor import FCNNPredictor
         return FCNNPredictor
     elif predictor_type == 'cnn':
-        from prediction.svm_predictor import CNNPredictor
+        from prediction.convolutional_nn_predictor import CNNPredictor
         return CNNPredictor
     else:
         raise NotImplementedError(f"Predictor type {predictor_type} should be implemented!")

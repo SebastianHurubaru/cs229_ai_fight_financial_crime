@@ -8,7 +8,7 @@ class CNNPredictor(Predictor):
 
     def __init__(self, **kwargs):
 
-        super().__init__(kwargs)
+        super().__init__(**kwargs)
         self.batch_size = kwargs.pop('batch_size')
 
     def load_model(self):
